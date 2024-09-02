@@ -11,11 +11,20 @@
   },
   "dependencies": {
     "@nuxtjs/tailwindcss": "^6.12.1",
+    "aws-amplify": "^6.5.3",
     "nuxt": "^3.13.0",
     "vue": "latest"
   },
   "packageManager": "pnpm@8.12.1+sha1.aa961ffce9b6eaa56307d9b5ff7e984f25b7eb58",
   "devDependencies": {
-    "@sidebase/nuxt-session": "^0.2.8"
+    "@aws-amplify/backend": "^1.2.0",
+    "@aws-amplify/backend-cli": "^1.2.5",
+    "@sidebase/nuxt-session": "^0.2.8",
+    "aws-cdk": "^2",
+    "aws-cdk-lib": "^2",
+    "constructs": "^10.0.0",
+    "esbuild": "^0.23.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4"
   }
 }
