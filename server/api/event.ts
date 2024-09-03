@@ -1,4 +1,14 @@
-export default defineEventHandler(async (event) => {
-    const body = await readBody(event);
-    console.log(JSON.stringify(body, null, 2));
+import { generateClient } from "aws-amplify/data";
+
+export default defineEventHandler(async (input) => {
+    const event = await readBody(input);
+    console.log(event);
+
+    const client = generateClient();
+
+    try {
+        await client.models.Event.create(event);
+    } catch (error) {
+        console.error("Error creating event:", error);
+    }
 });
