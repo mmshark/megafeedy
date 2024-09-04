@@ -4,10 +4,10 @@ const schema = a.schema({
   Term: a
   .model({
     term: a.string().required(),
-    url: a.string().required(),
-    impressions: a.integer().required(),
-    clicks: a.integer().required(),
-  })
+    url: a.url().required(),
+    impressions: a.integer().default(0),
+    clicks: a.integer().default(0),
+  }).identifier(['term'])
     .authorization(allow => [allow.publicApiKey()]),
   Event: a
     .model({
