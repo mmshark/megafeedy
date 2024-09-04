@@ -1,4 +1,5 @@
 <template>
+    hola
     <div :class="styleClass">
         <button 
             v-for="(term, index) in props.terms" 

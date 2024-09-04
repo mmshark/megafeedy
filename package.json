@@ -10,8 +10,11 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@aws-lambda-powertools/logger": "^2.7.0",
     "@nuxtjs/tailwindcss": "^6.12.1",
+    "@types/aws-lambda": "^8.10.145",
     "aws-amplify": "^6.5.3",
+    "aws-lambda": "^1.0.7",
     "nuxt": "^3.13.0",
     "vue": "latest"
   },
