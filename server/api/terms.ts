@@ -1,23 +1,17 @@
-const terms = [
-    {
-        term: "Official Site Lottery",
-        url: "https://srch.amazingfact.org/query?q=Official+Site+Lottery&type=display-Official+Site+Lottery",
-    },
-    {
-        term: "Medisoft Billing Software Cost",
-        url: "https://srch.amazingfact.org/query?q=Medisoft+Billing+Software+Cost&type=display-Medisoft+Billing+Software+Cost",
+import { Amplify } from 'aws-amplify';
+import outputs from "@/amplify_outputs.json";
 
-    },
-    {
-        term: "How To Win Mass Cash",
-        url: "https://srch.amazingfact.org/query?q=Medisoft+Billing+Software+Cost&type=display-Medisoft+Billing+Software+Cost",
-    },
-    {
-        term: "Outpatient Substance Abuse Programs",
-        url: "https://srch.amazingfact.org/query?q=Outpatient+Substance+Abuse+Programs&type=display-Outpatient+Substance+Abuse+Programs",
+import { generateClient } from "aws-amplify/data";
+
+export default defineEventHandler(async () => {
+    Amplify.configure(outputs, {ssr: true});
+    const dataClient = generateClient();
+    
+    try {
+        const terms = await dataClient.models.Term.list();
+        return terms.data;
+    } catch (error) {
+        console.error("Error fetching terms:", error);
+        return { error: "Failed to fetch terms" };
     }
-]
-
-export default defineEventHandler(async (event) => {
-    return terms;
 });
