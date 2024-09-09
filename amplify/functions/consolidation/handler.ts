@@ -4,7 +4,7 @@ import { env } from '$amplify/env/consolidation';
 
 import { Logger } from "@aws-lambda-powertools/logger";
 
-import { listTerms } from './graphql/queries';
+import { listEvents } from './graphql/queries';
 
 
 Amplify.configure(
@@ -45,8 +45,15 @@ const logger = new Logger({
 export const handler = async (event: any, context: any) => {
     logger.info("Consolidating events");
     logger.info(JSON.stringify(env));
+    const filter = {
+        createdAt: {
+            between: ["2024-09-01T00:00:00Z", "2024-09-31T23:59:59Z"]
+        }
+    };
+
     let response = await dataClient.graphql({
-        query: listTerms,
-      });
+        query: listEvents,
+        variables: { filter }
+    });
     logger.info("response", JSON.stringify(response));
 };
