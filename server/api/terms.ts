@@ -1,17 +1,15 @@
 import { Amplify } from 'aws-amplify';
 import outputs from "@/amplify_outputs.json";
-
 import { generateClient } from "aws-amplify/data";
 
-export default defineEventHandler(async () => {
-    Amplify.configure(outputs, {ssr: true});
-    const dataClient = generateClient();
-    
+Amplify.configure(outputs);
+const dataClient = generateClient();
+
+export default defineEventHandler(async () => {    
     try {
-        const terms = await dataClient.models.Term.list();
-        return terms.data;
+        const { data } = await dataClient.models.Term.list();
+        return data;
     } catch (error) {
-        console.error("Error fetching terms:", error);
-        return { error: "Failed to fetch terms" };
+        return error;
     }
 });
