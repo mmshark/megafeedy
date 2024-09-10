@@ -31,3 +31,4 @@ logs
 .amplify
 amplify_outputs*
 amplifyconfiguration*
+amplify/**/graphql

@@ -1,6 +1,8 @@
 import { defineBackend } from '@aws-amplify/backend';
 import { data } from './data/resource';
+import { consolidationFunction } from './functions/consolidation/resource';
 
-defineBackend({
+const backend = defineBackend({
   data,
+  consolidationFunction
 });
