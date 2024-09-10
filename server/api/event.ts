@@ -1,17 +1,17 @@
 import { Amplify } from 'aws-amplify';
 import outputs from "@/amplify_outputs.json";
-
 import { generateClient } from "aws-amplify/data";
 
+Amplify.configure(outputs);
+const dataClient = generateClient();
+
 export default defineEventHandler(async (input) => {
-    Amplify.configure(outputs, {ssr: true});
-    const dataClient = generateClient();
-
     const event = await readBody(input);
-
+    
     try {
-        await client.models.Event.create(event);
+        const { data } = await dataClient.models.Event.create(event);
+        return data;
     } catch (error) {
-        console.error("Error creating event:", error);
+        return error;
     }
 });
