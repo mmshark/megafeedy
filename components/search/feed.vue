@@ -42,21 +42,26 @@ onBeforeMount(async () => {
 })
 
 watch(
-  () => props.terms,
-  () => {
-    props.terms.forEach(async (term, index) => {
-        const response = $fetch('/api/event', {
-            method: 'POST',
-            body: {
-                "session_id": session.value.id,
-                "type": "TERM_IMPRESSION",
-                "term": term.term,
-                "position": index,
-                "style": styleClass
+    () => props.terms,
+    async () => {  
+        for (const [index, term] of props.terms.entries()) {
+            try {
+                const response = await $fetch('/api/event', {  
+                    method: 'POST',
+                    body: {
+                        "session_id": session.value.id,
+                        "type": "TERM_IMPRESSION",
+                        "term": term.term,
+                        "position": index,
+                        "style": styleClass
+                    }
+                });
+            } catch (error) {
+                console.error("Error sending TERM_IMPRESSION event:", error); 
             }
-        });        
-    })
-  }
+        }
+    },
+    { immediate: true } 
 )
 
 const onClickTerm = (term, index) => {
