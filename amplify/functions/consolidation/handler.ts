@@ -109,26 +109,26 @@ export const handler = async (event: any, context: any) => {
             const existingItem = await dataClient.graphql({
                 query: queries.getTermConsolidatedByDate,
                 variables: { term: term, date: date },
-              });
+            });
               
-              const item = {
+            const item = {
                 term: term,
                 date: date,
                 impressions: eventCountsByType['TERM_IMPRESSION'] || 0,
                 clicks: eventCountsByType['TERM_CLICK'] || 0,
-              }
+            }
 
-              if (existingItem) {
+            if (existingItem.data.getTermConsolidatedByDate) {
                 await dataClient.graphql({
                   query: mutations.updateTermConsolidatedByDate,
                   variables: { input: item },
                 });
-              } else {
+            } else {
                 await dataClient.graphql({
                   query: mutations.createTermConsolidatedByDate,
                   variables: { input: item },
                 });
-              }
+            }
         } catch (err) {
           logger.error("Error updating term consolidated by date", { error: err, input: input });
         }
