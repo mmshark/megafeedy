@@ -1,7 +1,7 @@
 <template>
     <div :class="styleClass">
         <button 
-            v-for="(term, index) in props.terms" 
+            v-for="(term, index) in props.terms.slice(0, props.size)" 
             :key="term.term" 
             class="feed-item"
             @click.prevent="onClickTerm(term, index)"
@@ -19,6 +19,10 @@ const props = defineProps({
     terms: {
         type: Array,
         required: true
+    },
+    size: {
+        type: Number,
+        default: 5
     }
 })
 
