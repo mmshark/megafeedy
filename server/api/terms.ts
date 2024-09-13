@@ -12,49 +12,44 @@ export default defineEventHandler(async (event) => {
     const toDate = query.toDate || "2100-01-01";
     
     try {
-        const terms = await dataClient.models.Term.list();
+        const [termsResponse, termsByDateResponse] = await Promise.all([
+            dataClient.models.Term.list(),
+            dataClient.models.TermConsolidatedByDate.list({
+                filter: {
+                    date: {
+                        between: [fromDate, toDate]
+                    }
+                }
+            })
+        ]);
 
-        const termsMap = terms.data.reduce((acc, term) => {
-            acc[term.term] = term;
-            acc[term.term].events = {}
-            acc[term.term].metrics = {}
+        const termsMap = termsResponse.data.reduce((acc, term) => {
+            acc[term.term] = {
+                ...term,
+                events: { impressions: 0, clicks: 0 },
+                metrics: {}
+            };
             return acc;
         }, {});
 
-        const termsByDate = await dataClient.models.TermConsolidatedByDate.list({
-            filter: {
-                date: {
-                    between: [fromDate, toDate]
-                }
-            }
-        });
-
-        const termsTotalMap = termsByDate.data.reduce((acc, curr) => {
-            const { term, impressions = 0, clicks = 0 } = curr;
-            if (!acc[term]) {
-                acc[term] = { 
+        for (const { term, impressions = 0, clicks = 0 } of termsByDateResponse.data) {
+            if (!termsMap[term]) {
+                termsMap[term] = {
                     term,
-                    events: {
-                        impressions: 0, 
-                        clicks: 0 
-                    },
+                    events: { impressions: 0, clicks: 0 },
                     metrics: {}
                 };
             }
-            acc[term].events.impressions += impressions;
-            acc[term].events.clicks += clicks;
-            return acc;
-        }, {});
-
-        for (const term in termsTotalMap) {
-            const { events } = termsTotalMap[term];
-            termsMap[term].events = events;
-            termsMap[term].metrics.ctr = events.impressions > 0 ? parseFloat((events.clicks / events.impressions).toFixed(3)) : 0;
+            termsMap[term].events.impressions += impressions;
+            termsMap[term].events.clicks += clicks;
         }
 
-        const termsTotal = Object.values(termsMap);
+        for (const termData of Object.values(termsMap)) {
+            const { impressions, clicks } = termData.events;
+            termData.metrics.ctr = impressions > 0 ? parseFloat((clicks / impressions).toFixed(3)) : 0;
+        }
 
-        return termsTotal;
+        return Object.values(termsMap);
     } catch (error) {
         return { error: error.message }; 
     }
