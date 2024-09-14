@@ -1,13 +1,14 @@
 <template>
     <div :class="styleClass">
         <button 
-            v-for="(term, index) in props.terms.slice(0, props.size)" 
+            v-for="(term, index) in props.terms.slice(0, props.size)"
             :key="term.term" 
             class="feed-item"
             @click.prevent="onClickTerm(term, index)"
         >
             <span class="text" :class="term.decorColor">
-                {{ term.term }}
+                {{ term.term }} 
+                <span v-if="props.debug">( I: {{term.events.impressions}} C: {{term.events.clicks}} CTR: {{term.metrics.ctr}} )</span>
             </span>
             <span class="icon"></span>
         </button>
@@ -16,13 +17,21 @@
 
 <script setup>
 const props = defineProps({
-    terms: {
+    terms: {        
         type: Array,
         required: true
     },
     size: {
         type: Number,
         default: 5
+    },
+    sort: {
+        type: String,
+        default: 'random'
+    },
+    debug: {
+        type: Boolean,
+        default: true
     }
 })
 
@@ -45,10 +54,22 @@ onBeforeMount(async () => {
     await update({ "styleClass": styleClass })
 })
 
+function resolvePath(obj, path) {
+    return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+}
 watch(
     () => props.terms,
     async () => {  
-        for (const [index, term] of props.terms.entries()) {
+        if (props.sort === 'random') {
+            props.terms.sort(() => Math.random() - 0.5);
+        } else {
+            props.terms.sort((a, b) => {
+                const aValue = resolvePath(a, props.sort) || 0; 
+                const bValue = resolvePath(b, props.sort) || 0;
+                return bValue - aValue;
+            });
+        }
+        for (const [index, term] of props.terms.slice(0, props.size).entries()) {
             try {
                 const response = await $fetch('/api/event', {  
                     method: 'POST',
@@ -63,7 +84,7 @@ watch(
             } catch (error) {
                 console.error("Error sending TERM_IMPRESSION event:", error); 
             }
-        }
+        }   
     },
     { immediate: true } 
 )
